@@ -1,0 +1,304 @@
+/*
+* Design Document
+* COMP 40 - Homework 2
+* Nick Daigler & Minh Duc Nguyen
+* September 16th, 2018
+*/
+
+        
+    /*
+    *
+    * Interface for UArray2
+    * uarray2.h
+    *
+    */
+
+    1.)
+
+    * The abstract entity we are trying to represent is a two dimensional 
+        array. The array will be an abstraction built on top of Hanson's 
+        and Ramsey's UArray structure. Constructing an abstraction of a 
+        two dimensional array on top of the pre-existing UArray will 
+        allow us to abstract away a degree of functionality from our
+        representation, such as allocating and freeing memory.
+
+        To the client, our two dimensional array can be thought of a as
+        a grid. However, we plan on implementing this mental model by
+        manipulating how data is stored in a larger one dimensional
+        UArray. For example, if a client calls the UArray2_new function
+        and specifies a two dimensional array of 3 rows and 3 columns,
+        our implementation will allocate enough memory for 9 elements
+        of the specified size. (3 rows x 3 columns = UArray with 9 slots)
+
+
+    2.)
+
+    * The following are the functions our two dimensional array will offer.
+        Below each description of a given function is the corresponding
+        proposed header function.
+
+    * A constructor that returns the array being initialized.
+        This function will take parameters that specify the
+        width and height of the array, as well as the size of
+        the elements that are to be contained in the array. It
+        will most likely make use of the constructor in 
+        uarray.h - UArray_new(int length, int size). 
+
+        UArray2* UArray2_new(int width, int height, int element_size);
+
+
+    * A function that frees memory associated with our representation of a
+        two dimensional array. This function will take one parameter: a
+        pointer to an instance of UArray2. 
+
+        It will most likely make use of the function used to free memory
+        in uarray.h: UArray_free(T *uarray).
+
+        void UArray2_free(UArray2** array);
+
+
+    * A function that returns the int representation of the width of a 
+        specified UArray2. This function will take in one parameter: an
+        instance of UArray2.
+
+        int UArray2_width(Uarray2* array);
+
+
+    * A function that returns the int representation of the height of a
+        specified UArray2. This function will take in one parameter: an
+        instance of UArray2.
+
+        int UArray2_height(Uarray2* array);
+
+
+    * A function that returns the int representation of the size of a 
+        specified UArray2. This function will take in one parameter: an
+        instance of UArray2. It will return the total number of possible
+        elements that can be stored in the provided UArray2 instance of the
+        size specified at initialization.
+
+        int UArray2_size(Uarray2* array);
+
+
+    * A function that returns a void pointer to an entity contained in the
+        UArray2. This function will take in an instance of UArray2, an int
+        representing the row index of a given entity, and an int 
+        representing the column index of the given entity on the 2D array. 
+        The position of the entity in the big array will then be calculated 
+        as position = width of 2D array * row + column. So if we are trying 
+        to find an element on row 3, column 3 of a 5x6 2D array, its 
+        position of the big array representation will be 3 * 5 + 3 = 18. 
+        The function will then call the UArray_at function from the Hanson 
+        interface and pass in the position of the wanted entity on the big 
+        array representation to find it there.
+
+        void * UArray2_at(UArray2* array, int row, int col);
+
+
+    * A function that maps a function to each element in the two
+        dimensional array, row by row. The function will take three
+        parameters: an instance of UArray2, a function pointer, and a
+        boolean. The boolean value will most likely be validated by
+        calls to other UArray2 functions to ensure that the two dimensional
+        array being mapped to is a valid two dimensional array. The 
+        function pointer will point to a function that takes three
+        parameters: an instance of UArray2, an int to represent a row,
+        an int to represent a column.
+
+        void UArray2_map_row_major(UArray2* array, void(int row, int col,
+                                   UArray2* array, void *val, void *cl),
+                                   void *cl);
+
+
+    * A function that maps a function to each element in the two
+        dimensional array, column by column. This function will most
+        likely be similar to UArray2_map_row_major, as the only difference
+        is the order in which the function applies the function passed in
+        to the indices in the two dimensional array. The function will 
+        take three parameters: an instance of UArray2, a function pointer,
+        and a boolean. The boolean value will most likely be validated by
+        calls to other UArray2 functions to ensure that the two dimensional
+        array being mapped to is a valid two dimensional array.
+
+        void UArray2_map_col_major(UArray2* array, void(int row, int col,
+                                   UArray2* array, void *val, void *cl),
+                                   void *cl);
+
+
+    ******************
+
+    4.)
+
+    UArray2 Invariants
+
+    * The memory occupied by the 2D array will always be equal to the 
+        memory of each element (allocated in the Hanson array new function)
+        multiplied by the number of element (equal to width * height)
+
+    * Our implementation of a 2D array will make use of a single UArray_T
+
+    * Mapping functions iterate over the 2D array row by row, or column by
+        column, beginning at index 0.
+
+    * All unoccupied memory in the 2D is initialized to the value zero.
+        calloc is used in UArray_new to allocate memory, and our
+        implementation calls UArray_new to allocate memory.
+
+    * UArray2_new function: the function will always call the UArray_new
+        function of the Hanson interface to create an array big enough to
+        contain the 2D array. The size of the big array will always be
+        calculated as the product of the width and height of the 2D array
+        as specified
+
+    * UArray2_at function: the function will always call the UArray_at
+        function from the Hanson interface after calculating its position
+        on the big array representation based on the information about its
+        position on the 2D array using the formula position = 2D array's
+        width * position on row + position on column
+
+    ***********************************************************************
+
+    /*
+    *
+    * Interface for Bit2
+    * bit2.h
+    *
+    */
+
+    1.)
+
+    * The abstract entity we are trying to represent is a two dimensional 
+        array of bits. The array will be an abstraction built on top of
+        Hanson's and Bit Vector abstraction. By implementing functions exported
+        from Bit Vector, we will abstractly represent a two dimensional bit
+        vector. We plan on implementing our two dimensional bit vector by
+        constructing a larger one dimensional Bit Vector and manipulating how
+        the client interacts with it.
+
+        Similar to the example provided in our plan for a two dimensional
+        array, if a client specifies a two dimensional bit vector with 3
+        rows and 3 columns, our implementation will create a one dimensional
+        bit vector that will be able to hold 9 bits. 
+        (3 rows x 3 columns = 9 bits)
+
+
+    2.)
+
+    * The following are the functions our two dimensional array will offer.
+        Below each description of a given function is the corresponding
+        proposed header function.
+
+    * A constructor that returns a pointer to the two dimensional bit 
+        vector being initialized. This function will take parameters that
+        specify the width and height of the bit vector. It will most 
+        likely make use of the constructor in bit.h - Bit_new(int length). 
+
+        Bit2* Bit2_new(int row, int col);
+
+
+    * A function that frees memory associated with our representation of a
+        two dimensional bit vector. This function will take one paramter: a
+        pointer to an instance of Bit2. It will most likely make use of the
+        function used to free memory in bit.h - Bit_free(T *uarray).
+
+        void Bit2_free(Bit2* array);
+
+
+    * A function that returns the int representation of the width of a 
+        specified Bit2. This function will take in one parameter: an
+        instance of Bit2.
+
+        int Bit2_width(Bit2* array);
+
+
+    * A function that returns the int representation of the height of a
+        specified Bit2. This function will take in one parameter: an
+        instance of Bit2.
+
+        int Bit2_height(Bit2* array);
+
+
+    * A function that returns the int representation of the size of a 
+        specified Bit2. This function will take in one parameter: an
+        instance of Bit2. It will return the total number of possible
+        bits that can be stored in the provided Bit2 instance.
+
+        int Bit2_size(Bit2* array);
+
+
+    * A function that returns the bit at a specified index and returns
+        an integer representation of 1 or 0, depending on whether or not
+        the bit is in the two dimensional bit vector. 
+
+        It will most likely make use of the function used to get bits in
+        bit.h - Bit_get(Bit2* array, int). The position of
+        the entity in the big array (which will be passed into bit_get) 
+        will be calculated as position = width of 2D array * row + column
+        So if we are trying to find an element on row 3, column 3 of a 
+        5x6 2D array, its position of the big array representation will 
+        be 3 * 5 + 3 = 18
+
+
+        int Bit2_get(Bit2* array, int row, int col);
+
+
+    * A function that maps a function to each bit in the two
+        dimensional bit vector, row by row. The function will take three
+        parameters: an instance of Bit2, a function pointer, and a
+        boolean. The boolean value will most likely be validated by
+        calls to other Bit2 functions to ensure that the two dimensional
+        bit vector being mapped to is a valid two dimensional bit vector.
+        The function pointer will point to a function that takes three
+        parameters: an instance of Bit2, an int to represent a row,
+        an int to represent a column.
+
+        void Bit2_map_row_major(Bit2* array, void(int row, int col, 
+                                Bit2* array, void *val, void *cl),
+                                void *cl);
+
+
+    * A function that maps a function to each element in the two
+        dimensional bit vector, column by column. This function will most
+        likely be similar to Bit2_map_row_major, as the only difference
+        is the order in which the function applies the function passed in
+        to the indices in the two dimensional bit vector. The function will
+        take three parameters: an instance of Bit2, a function pointer,
+        and a boolean. The boolean value will most likely be validated by
+        calls to other Bit2 functions to ensure that the two dimensional
+        bit vector being mapped to is a valid two dimensional bit vector.
+
+        void Bit2_map_col_major(Bit2* array, void(int row, int col,
+                                Bit2* array, void *val, void *cl),
+                                void *cl);
+
+
+    ******************
+
+    4.)             
+
+    Bit2 Invariants
+
+    * The memory occupied by the 2D array will always be equal to the
+        memory of 0 and 1 multiplied by the number of element
+        (equal to width * height)
+
+    * Our implementation of a 2D array will always make use of a single
+        Bit_T instance.
+
+    * Mapping functions iterate over the 2D array row by row, or column by
+        column, beginning at index 0.
+
+    * Bit2_new function: the function will always call the Bit_new
+        function of the Hanson interface to create an array big enough to
+        contain the 2D array. The size of the big array will always be
+        calculated as the product of the width and height of the 2D array
+        as specified
+
+    * Bit2_get function: the function will always call the Bit_get function
+        from the Hanson interface after calculating its position on the big
+        array representation based on the information about its position on
+        the 2D array using the following formula: 
+
+        index = 2D array's width * position on row + position on column
+
+    ***********************************************************************
